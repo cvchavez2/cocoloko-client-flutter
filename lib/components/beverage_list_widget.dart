@@ -23,21 +23,37 @@ class _BeverageListWidgetState extends State<BeverageListWidget> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: _util.get(),
+        future: _util.get(), // http get request
         initialData: [],
         builder: (context, projectSnap) {
           if (projectSnap.data is List<Beverage>) {
             print(projectSnap.data.runtimeType);
             _beverageList = projectSnap.data;
-            return CarouselSlider(
-              options: CarouselOptions(
-                height: 400.0,
-                autoPlay: false,
+            return imageCarousel();
+          } else {
+            return CircularProgressIndicator();
+          }
+        });
+  }
+
+  Widget imageCarousel() {
+    return CarouselSlider(
+      options: CarouselOptions(
+        height: 400.0,
+        autoPlay: false,
+      ),
+      items: _beverageList.map((beverage) {
+        return Builder(
+          builder: (BuildContext context) {
+            return GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => BeverageWidget(beverage)),
               ),
-              items: _beverageList.map((beverage) {
-                return Builder(
-                  builder: (BuildContext context) {
-                    return BeverageWidget(beverage);
+              child: Image.network(
+                  "http://placecorgi.com/300/400"), // TODO make it a custom image widget
+            );
 //            return Container(
 //                width: MediaQuery.of(context).size.width,
 //                margin: EdgeInsets.symmetric(horizontal: 5.0),
@@ -46,13 +62,9 @@ class _BeverageListWidgetState extends State<BeverageListWidget> {
 //                  'text $i',
 //                  style: TextStyle(fontSize: 16.0),
 //                ));
-                  },
-                );
-              }).toList(),
-            );
-          } else {
-            return CircularProgressIndicator();
-          }
-        });
+          },
+        );
+      }).toList(),
+    );
   }
 }
